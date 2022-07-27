@@ -24,7 +24,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect("mongodb+srv://admin-"+process.env.ADMIN+":"+process.env.PASSWORD+"@cluster0.od74r.mongodb.net/userDb");
+mongoose.connect("mongodb+srv://admin-saurav:test123@cluster0.od74r.mongodb.net/userDb");
 const userSchema = new mongoose.Schema({
   email: String,
   password: String,
@@ -88,19 +88,23 @@ app.get("/register", function (req, res) {
   res.render("register");
 });
 app.get("/secrets", function (req, res) {
-    User.find({"Secret":{$ne:null}},function(err,foundUser){
-        if(err)
-        {
-            console.log(err);
-        }
-        else
-        {
-            if(foundUser)
+    if (req.isAuthenticated()) {
+        User.find({"Secret":{$ne:null}},function(err,foundUser){
+            if(err)
             {
-                res.render("secrets",{userWithSecrets:foundUser});
+                console.log(err);
             }
-        }
-    })
+            else
+            {
+                if(foundUser)
+                {
+                    res.render("secrets",{userWithSecrets:foundUser});
+                }
+            }
+        })
+      } else {
+        res.redirect("/login");
+      }
 });
 
 app.get('/submit',(req,res)=>{
